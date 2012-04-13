@@ -4,14 +4,14 @@ Plugin Name:  Twitter Feed for WordPress
 Plugin URI:   http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/
 Donate link:  http://pleer.co.uk/go/twitter-paypal/
 Description:  A simple Twitter feed that outputs your latest tweets in HTML into any post, page, template or sidebar widget. Customisable and easy to install!
-Version:      1.2
+Version:      1.2.1
 Author:       Alex Moss
 Author URI:   http://alex-moss.co.uk/
 Link: http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/
 Tags: twitter, tweets, twitter feed, twitter updates, seo, plugin, widget, sidebar, page, post
 Requires at least: 2.7
-Tested up to: 3.2.1
-Stable tag: 1.2
+Tested up to: 3.3.1
+Stable tag: 1.2.1
 
 A simple Twitter feed that outputs your latest tweets in HTML into your page, template or sidebar widget. Customisable and easy to install!
 
@@ -37,7 +37,11 @@ For full configuration and options please visit the [Twitter Feed WordPress Plug
 
 == Changelog ==
 
-= 1.1.2 =
+= 1.2.1 =
+
+* Remove "nofollow" from rel tag
+
+= 1.2 =
 
 * Added Web Intents
 * Added Follow Button

@@ -3,7 +3,7 @@
 Plugin Name:  Twitter Feed for WordPress
 Plugin URI:   http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/
 Description:  A simple Twitter feed that outputs your latest tweets in HTML into any post, page, template or sidebar widget. Customisable and easy to install!
-Version:      1.2
+Version:      1.2.1
 Author:       Alex Moss
 Author URI:   http://alex-moss.co.uk/
 Contributors: pleer
@@ -48,7 +48,7 @@ function Twitterfeedreader($atts) {
 		"smalltime" => 'yes',
 		"smalltimeclass" => '',
 		"conditional" => 'yes',
-		"tprefix" => '',
+		"tprefix" => '(about',
 		"tsecs" => 'seconds',
 		"tmin" => 'minutes',
 		"tmins" => 'minutes',
@@ -56,7 +56,7 @@ function Twitterfeedreader($atts) {
 		"thours" => 'hours',
 		"tday" => 'day',
 		"tdays" => 'days',
-		"tsuffix" => 'ago',
+		"tsuffix" => 'ago)',
 		"phptime" => 'j F Y \a\t h:ia',
 		"linktotweet" => 'yes',
 		"divid" => '',
@@ -132,22 +132,22 @@ function Twitterfeedreader($atts) {
 			$posted = "";
 			if ($conditional == "yes") {
 				if ($when < 60) {
-					$posted = $tprefix.$when." ".$tsecs." ".$tsuffix;
+					$posted = $tprefix." ".$when." ".$tsecs." ".$tsuffix;
 				}
 				if (($posted == "") & ($when < 3600)) {
-					$posted = $tprefix.(floor($when / 60))." ".$tmins." ".$tsuffix;
+					$posted = $tprefix." ".(floor($when / 60))." ".$tmins." ".$tsuffix;
 				}
 				if (($posted == "") & ($when < 7200)) {
-					$posted = $tprefix."1 ".$thour." ".$tsuffix;
+					$posted = $tprefix." 1 ".$thour." ".$tsuffix;
 				}
 				if (($posted == "") & ($when < 86400)) {
-					$posted = $tprefix.(floor($when / 3600))." ".$thours." ".$tsuffix;
+					$posted = $tprefix." ".(floor($when / 3600))." ".$thours." ".$tsuffix;
 				}
 				if (($posted == "") & ($when < 172800)) {
-					$posted = $tprefix."1 ".$tday." ".$tsuffix;
+					$posted = $tprefix." 1 ".$tday." ".$tsuffix;
 				}
 				if ($posted == "") {
-					$posted = $tprefix.(floor($when / 86400))." ".$tdays." ".$tsuffix;
+					$posted = $tprefix." ".(floor($when / 86400))." ".$tdays." ".$tsuffix;
 				}
 			} else {
 				$date = date($phptime, strtotime($item->get_date()));
@@ -156,9 +156,9 @@ function Twitterfeedreader($atts) {
 		$entry = $entry."\n<br />".$pubtext.$posted;
 		}
 			if ($anchor == "") {
-				$tweet = preg_replace("/(http:\/\/)(.*?)\/([\w\.\/\&\=\?\-\,\:\;\#\_\~\%\+]*)/", "<a href=\"\\0\" rel=\"external nofollow\">\\0</a>", $tweet);
+				$tweet = preg_replace("/(http:\/\/)(.*?)\/([\w\.\/\&\=\?\-\,\:\;\#\_\~\%\+]*)/", "<a href=\"\\0\" rel=\"nofollow\">\\0</a>", $tweet);
 			} else {
-				$tweet = preg_replace("/(http:\/\/)(.*?)\/([\w\.\/\&\=\?\-\,\:\;\#\_\~\%\+]*)/", "<a href=\"\\0\" rel=\"external nofollow\">".$anchor."</a>", $tweet);
+				$tweet = preg_replace("/(http:\/\/)(.*?)\/([\w\.\/\&\=\?\-\,\:\;\#\_\~\%\+]*)/", "<a href=\"\\0\" rel=\"nofollow\">".$anchor."</a>", $tweet);
 			}
 		 if ($mode != "fav") {
 			//SETUP SPECIAL ATTRIBUTES
@@ -178,9 +178,9 @@ function Twitterfeedreader($atts) {
 				$avatar = "<img src=\"".$avatar."\" height=\"48\" width=\"48\" alt=\"".$author."\" title=\"".$author."\" ".$preimgclass.$imgclass."\">";
 				if ( $userlinks == "yes" ) {
 				if ( $userintent == "yes" ) {
-					$avatar = "<div style=\"float: left; margin: 0px 10px 10px 0px;\"><a href=\"https://twitter.com/intent/user?screen_name=".$author."\" rel=\"external nofollow\">".$avatar."</a></div>";
+					$avatar = "<div style=\"float: left; margin: 0px 10px 10px 0px;\"><a href=\"https://twitter.com/intent/user?screen_name=".$author."\" rel=\"nofollow\">".$avatar."</a></div>";
 				} else {
-					$avatar = "<div style=\"float: left; margin: 0px 10px 10px 0px;\"><a href=\"http://twitter.com/".$author."\" rel=\"external nofollow\">".$avatar."</a></div>";
+					$avatar = "<div style=\"float: left; margin: 0px 10px 10px 0px;\"><a href=\"http://twitter.com/".$author."\" rel=\"nofollow\">".$avatar."</a></div>";
 				}
 }
 			}
@@ -195,24 +195,23 @@ function Twitterfeedreader($atts) {
 				$tweet = preg_replace("(([a-zA-Z0-9\_]+):)", "", $tweet, 1);
 			}
  		} else {
- 		if ($other == "yes"){$tweet = preg_replace("(([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/\\1\" rel=\"external nofollow\">\\1</a>", $tweet, 1);}
+ 		if ($other == "yes"){$tweet = preg_replace("(([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/\\1\" rel=\"nofollow\">\\1</a>", $tweet, 1);}
  		}
 		if ( $userlinks == "yes" ) {
 			if ( $userintent == "yes" ) {
-				$tweet = preg_replace("(@([a-zA-Z0-9\_]+))", "<a href=\"https://twitter.com/intent/user?screen_name=\\1\" rel=\"external nofollow\">\\0</a>", $tweet);
+				$tweet = preg_replace("(@([a-zA-Z0-9\_]+))", "<a href=\"https://twitter.com/intent/user?screen_name=\\1\" rel=\"nofollow\">\\0</a>", $tweet);
 			} else {
-				$tweet = preg_replace("(@([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/\\1\" rel=\"external nofollow\">\\0</a>", $tweet);
+				$tweet = preg_replace("(@([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/\\1\" rel=\"nofollow\">\\0</a>", $tweet);
 			}
 		}
 		if ( $hashlinks == "yes" ) {
-			$tweet = preg_replace("(#([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/search?q=%23\\1\" rel=\"external nofollow\">\\0</a>", $tweet);
+			$tweet = preg_replace("(#([a-zA-Z0-9\_]+))", "<a href=\"http://twitter.com/search?q=%23\\1\" rel=\"nofollow\">\\0</a>", $tweet);
 		}
 
 		if ($tweetintent == "yes") {
 			$tweetID = strstr($item->get_permalink(), "statuses/");
 			$tweetID = substr($tweetID, 9);
-			//$tweet = $tweet."\n<a href=\"http://twitter.com/intent/retweet?related=".$username."&tweet_id=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/retweet.png\" alt=\"ReTweet\"/></a>\n<a href=\"http://twitter.com/intent/tweet?related=".$username."&in_reply_to=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/reply.png\" alt=\"Reply\"/></a>\n<a href=\"http://twitter.com/intent/favorite?related=".$username."&tweet_id=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/favorite.png\" alt=\"Favorite\"/></a>";
-			
+			$tweet = $tweet."\n<a href=\"http://twitter.com/intent/retweet?related=".$username."&tweet_id=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/retweet.png\" alt=\"ReTweet\"/></a>\n<a href=\"http://twitter.com/intent/tweet?related=".$username."&in_reply_to=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/reply.png\" alt=\"Reply\"/></a>\n<a href=\"http://twitter.com/intent/favorite?related=".$username."&tweet_id=".$tweetID."\" rel=\"nofollow\"><img src=\"http://si0.twimg.com/images/dev/cms/intents/icons/favorite.png\" alt=\"Favorite\"/></a>";
 		}
 
 		if ($timeline == "yes") {
@@ -224,10 +223,10 @@ function Twitterfeedreader($atts) {
 					} else {
 						$presmalltimeclass = "class=\"";
 					}
-				$posted = "<br />".$posted;
+				$posted = "<br /><font ".$presmalltimeclass.$smalltimeclass."\">".$posted."</font>";
 				$smalltimeclass='';
 				}
-				$tweet = $tweet."\n<a href=\"".$item->get_permalink()."\" rel=\"external nofollow\" class='tweet-date'>".$posted."</a>";
+				$tweet = $tweet."\n<a href=\"".$item->get_permalink()."\" rel=\"nofollow\">".$posted."</a>";
 			} else {
 				$tweet = $tweet."<br />(".$posted.")";
 			}
@@ -237,7 +236,7 @@ function Twitterfeedreader($atts) {
 		if ($liclass != ""){
 			$entry = "\n<li class=\"".$liclass."\">".$avatar.$tweet."</li>";
 		} else {
-			$entry = "\n<li style=\"display: inline-block; list-style: none; margin-bottom: 5px; padding-bottom: 5px;\">".$avatar.$tweet."</li>";
+			$entry = "\n<li style=\"display: inline-block; list-style: none; border-bottom: 1px #ccc dotted; margin-bottom: 5px; padding-bottom: 5px;\">".$avatar.$tweet."</li>";
 		}
 		$wholetweet = $wholetweet."".$entry;
 		$imgclass='';
@@ -252,24 +251,23 @@ function Twitterfeedreader($atts) {
 				if ($scheme == "dark") { $tfscheme = " data-button=\"grey\" data-text-color=\"#FFFFFF\" data-link-color=\"#00AEFF\""; }
 				if ($followercount == "no") { $tfcount = " data-show-count=\"false\""; }
 				if ($lang != "en") { $tflang = "  data-lang=\"".$lang."\""; }
-				$linktofeed = "<a href=\"http://twitter.com/".$username."\" class=\"twitter-follow-button\" rel=\"external nofollow\"".$tfscheme.$tfcount.$tflang.">@".$username."</a>\n";
+				$linktofeed = "<a href=\"http://twitter.com/".$username."\" class=\"twitter-follow-button\" rel=\"nofollow\"".$tfscheme.$tfcount.$tflang.">Follow @".$username."</a>\n";
 			} else {
-				$linktofeed = ("<a href=\"http://twitter.com/".$username."\" rel=\"external nofollow\">follow ".$username." on twitter</a><br />\n");
+				$linktofeed = ("<a href=\"http://twitter.com/".$username."\" rel=\"nofollow\">follow ".$username." on twitter</a><br />\n");
 			}
 		}
 		if ($mode == "fav") {
-			$linktofeed = ("<a href=\"http://twitter.com/".$username."/favorites\" rel=\"external nofollow\">view all favourites for ".$username."</a><br />\n");
+			$linktofeed = ("<a href=\"http://twitter.com/".$username."/favorites\" rel=\"nofollow\">view all favourites for ".$username."</a><br />\n");
 		}
 		if ($mode == "search") {
-			$linktofeed = ("<a href=\"http://twitter.com/search?q=".$term."\" rel=\"external nofollow\">view search results for \"".$term."\" on twitter</a><br />\n");
+			$linktofeed = ("<a href=\"http://twitter.com/search?q=".$term."\" rel=\"nofollow\">view search results for \"".$term."\" on twitter</a><br />\n");
 		}
 		if ($mode == "hashtag") {
-			$linktofeed = ("<a href=\"http://twitter.com/search?q=%23".$hashtag."\" rel=\"external nofollow\">view search results for \"#".$hashtag."\" on twitter</a><br />\n");
+			$linktofeed = ("<a href=\"http://twitter.com/search?q=%23".$hashtag."\" rel=\"ofollow\">view search results for \"#".$hashtag."\" on twitter</a><br />\n");
 		}
 	}
 	if ($linklove != "no"){ $pleer = "\nPowered by <a href=\"http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/\">Twitter Feed</a><br />\n"; }
-
-	$whole = "\n<!-- WordPress Twitter Feed Plugin: http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/ -->\n".$linktofeed.$divstart.$ulstart.$wholetweet."\n</ul>\n".$pleer.$divend."\n";
+	$whole = "\n<!-- WordPress Twitter Feed Plugin: http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/ -->\n".$divstart.$ulstart.$wholetweet."\n</ul>\n".$linktofeed.$pleer.$divend."\n";
 	return $whole;
 	}
 
