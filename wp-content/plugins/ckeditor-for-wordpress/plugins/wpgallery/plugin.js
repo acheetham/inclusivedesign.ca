@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 
-This file is for support Wordpress default/core gallery settings and image edit
+This file is for support WordPress default/core gallery settings and image edit
 Here are defined settings for context menu, css classes , html and text dataProcessor.
 */
 
@@ -19,35 +19,34 @@ if (!Array.prototype.indexOf)
 
 		var from = Number(arguments[1]) || 0;
 		from = (from < 0)
-				? Math.ceil(from)
-				: Math.floor(from);
+			? Math.ceil(from)
+			: Math.floor(from);
 		if (from < 0)
 			from += len;
 
 		for (; from < len; from++)
 		{
 			if (from in this &&
-					this[from] === elt)
+				this[from] === elt)
 				return from;
 		}
 		return -1;
 	};
 }
 
-var caption = '';
+var image_attributes = {};
 (function()
 {
+	var pluginPath;
 	CKEDITOR.plugins.add( 'wpgallery',
 	{
-		requires : [ 'htmlwriter',  'htmldataprocessor', 'entities'  ],
-		init: function( editor )
+		requires : [ 'htmlwriter', 'entities'  ],
+		onLoad : function()
 		{
-			//editor.config.entities = false;
-			// Borrowed from the pagebreak plugin
-
-			editor.addCss(
+			pluginPath = this.path;
+			CKEDITOR.addCss(
 				'img.cke_wpgallery' +
-				'{' +
+					'{' +
 					'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/gallery.png' ) + ');' +
 					'background-position: center center;' +
 					'background-color: #F2F8FF;' +
@@ -60,29 +59,32 @@ var caption = '';
 					'width:50% !important; _width:49.9% !important;' +
 					'height: 250px !important;' +
 					'page-break-after: always;' +
-				'}' +
-				'.aligncenter, dl.aligncenter' +
-				'{' +
+					'}' +
+					'.aligncenter, dl.aligncenter' +
+					'{' +
 					'display: block;' +
 					'margin-left: auto;' +
 					'margin-right: auto;'+
-				'}' +
-				'.alignleft'+
-				'{' +
+					'}' +
+					'.alignleft'+
+					'{' +
 					'float: left;' +
-				'}' +
-				'.alignright' +
-				'{' +
+					'}' +
+					'.alignright' +
+					'{' +
 					'float: right;' +
-				'}' +
-				'.wp-caption' +
-				'{' +
+					'}' +
+					'.wp-caption' +
+					'{' +
 					'background: url(' + CKEDITOR.getUrl( this.path + 'images/caption.png') + ') no-repeat scroll center bottom #F1F1F1;' +
 					'border: none;' +
 					'padding: 8px 8px 30px 8px !important;' +
 					'max-width: 632px !important; /* prevent too-wide images from breaking layout */' +
-				'}'
+					'}'
 			);
+		},
+		init: function( editor )
+		{
 			editor.addCommand( 'wpgallery_edit',
 			{
 				exec : function(editor)
@@ -91,8 +93,10 @@ var caption = '';
 					element = sel.getSelectedElement();
 
 					// Here we get the current value
-					if(CKEDITOR && element && element.data && element.data('gallery')) CKEDITOR.plugins.wpgallery.createGallery( editor, element, element.data('gallery'), 0 );
-					post_id = jQuery("#post_ID").attr('value');
+					if (CKEDITOR && element && element.data && element.data('gallery')) {
+						CKEDITOR.plugins.wpgallery.createGallery( editor, element, element.data('gallery'), 0 );
+					}
+					var post_id = jQuery("#post_ID").attr('value');
 					if (!post_id)
 					{
 						post_id = jQuery("[name='quickpress_post_ID']").attr('value');
@@ -238,14 +242,38 @@ var caption = '';
 			var dataProcessor = editor.dataProcessor,
 				dataFilter = dataProcessor && dataProcessor.dataFilter,
 				htmlFilter = dataProcessor && dataProcessor.htmlFilter;
-			caption = '';
+
+			var proto = CKEDITOR.htmlDataProcessor.prototype;
+			proto.toHtml = CKEDITOR.tools.override( proto.toHtml, function( org )
+			{
+				return function( data )
+				{
+					data = data.replace( /\[caption(.*?)\]([^>]+?>)(.*?)\[\/caption\]/mig, function(match, captionAttr, imgTag, captionText)
+					{
+						var pattern = /wp-image-([0-9]+)/i;
+						var match = pattern.exec(imgTag);
+						if (match[1]) {
+							image_attributes['wp-image-' + match[1]] = {
+								'data-cke-caption' : captionAttr.replace(/^ /, ''),
+								'data-cke-caption-text' : captionText
+							};
+							return imgTag;
+						}
+						return match;
+					});
+
+					// changes here
+					return org.apply( this, arguments );
+				};
+			});
+
 			if ( dataFilter )
 			{
 				dataFilter.addRules(
 				{
 					text : function( text )
 					{
-						//change &39; charactert to ' character in strings inside [] - for shortcodes
+						//change &39; character to ' character in strings inside [] - for shortcodes
 						text = text.replace( /\[(.+)\]/g, function( match, cont )
 						{
 							cont = cont.replace(/&#39;/g,"'");
@@ -256,16 +284,6 @@ var caption = '';
 						{
 							return CKEDITOR.plugins.wpgallery.createGallery( editor, null, match, 1 );
 						});
-						//clear caption from WYSIWYG mode and save its attributes in variable caption
-						text = text.replace(/\[caption(.*)\]/ig,function(match, cont)
-						{
-							caption = cont;
-							return '';
-						});
-						text = text.replace(/\[\/caption\]/ig,function(match, cont)
-						{
-							return '';
-						});
 						return text;
 					},
 					elements :
@@ -273,23 +291,33 @@ var caption = '';
 						'img' : function(element)
 						{
 							//for image with caption add special attribute
+							// <img class="size-medium wp-image-19" alt="alttext" src="/IMG_7668-300x225.jpg" width="300" height="225" />
 							var pattern = /wp-image-([0-9]+)/i;
-							if(element.attributes && pattern.test(element.attributes['class']))
+							if (element.attributes && pattern.test(element.attributes['class']))
 							{
 								var match = pattern.exec(element.attributes['class']);
-								pattern = new RegExp('id="attachment_'+match[1]+'"',"i");
-
-								if (match && match[1] && caption !== '' && pattern.test(caption) !== false)
-								{
-									//element.attributes['data-cke-caption'] =window.parent.CKEDITOR.tools.htmlEncode(caption);
-									element.attributes['class'] = element.attributes['class'] + ' wp-caption';
+								var obj = image_attributes['wp-image-' + match[1]];
+								if (obj) {
+									var caption = obj['data-cke-caption'];
+									var caption_text = obj['data-cke-caption-text'];
+									pattern = new RegExp('wp-caption',"i");
+									if (!pattern.exec(element.attributes['class']))
+									{
+										element.attributes['class'] = element.attributes['class'] + ' wp-caption';
+									}
 									pattern = /align="(aligncenter|alignnone|alignleft|alignright)"/i;
 									match = pattern.exec(caption);
+
 									if ( match && match[1])
 									{
-										element.attributes['class'] = element.attributes['class'] + ' '+match[1];
+										pattern = new RegExp(match[1],"i");
+										if (!pattern.exec(element.attributes['class']))
+										{
+											element.attributes['class'] = element.attributes['class'] + ' '+match[1];
+										}
 									}
-									element.attributes['data-cke-caption'] = caption;
+									element.attributes['data-cke-caption'] =  caption;
+									element.attributes['data-cke-caption-text']  = caption_text;
 								}
 							}
 						}
@@ -317,21 +345,16 @@ var caption = '';
 							{
 								//array of allowed attributes
 								var allowed_attributes = ['src', 'alt', 'title', 'width', 'height', 'class', 'style'];
-								text = element.attributes['data-cke-caption'];
-								var attributes = element.attributes;
-								var startElement = '<img ';
-								for (var i in attributes)
+								text = '[caption '+ CKEDITOR.tools.htmlEncode(element.attributes['data-cke-caption']) +']';
+
+								text += '<img ';
+								for (var attribute in element.attributes)
 								{
 									//add only allowed attributes
-									if (allowed_attributes.indexOf(i) != -1)
-										startElement = startElement+ '' + i + '="'+attributes[i]+'" ';
+									if (allowed_attributes.indexOf(attribute) != -1)
+										text += attribute + '="' + CKEDITOR.tools.htmlEncode(element.attributes[attribute]) + '" ';
 								}
-								startElement = startElement + '/>';
-								var html =  startElement ;
-								var pattern = /amp;/ig;
-								if (!pattern.test(text))
-									text = CKEDITOR.tools.htmlEncode(text);
-								text = '[caption'+text+']'+html+'[/caption]';
+								text += '/>' + CKEDITOR.tools.htmlEncode(element.attributes['data-cke-caption-text']).replace(/(\r\n|\n\r|\r|\n)/g, '<br />') + '[/caption]';
 								delete element.name;
 
 								return new CKEDITOR.htmlParser.text(text);
@@ -353,10 +376,10 @@ var caption = '';
 					}
 				});
 			}
-				//change elements path
-				var filters;
-				if ( editor._.elementsPath  )
-				{
+			//change elements path
+			var filters;
+			if ( editor._.elementsPath  )
+			{
 				if ( ( filters = editor._.elementsPath.filters ) )
 					filters.push( function( element )
 						{
@@ -383,10 +406,10 @@ var caption = '';
 			{
 				'data-cke-wpgallery'	: 1,
 				'contentEditable' : false,
-				'class' : 'wpGallery, cke_wpgallery',
+				'class' : 'wpGallery cke_wpgallery',
 				'title' : title,
 				'alt' : 'gallery',
-				'src' : CKEDITOR.getUrl( 'images/spacer.gif' )
+				'src' : CKEDITOR.getUrl( pluginPath + 'images/spacer.gif' )
 			});
 
 			element.data( 'gallery', text );

@@ -15,12 +15,19 @@ define ('ASSIGN_FOR_CHILDREN_RS', 'children');
 define ('ASSIGN_FOR_BOTH_RS', 'both');
 
 define( 'OBJECT_UI_RS', 'object_ui' );
-	
+
 require_once( dirname(__FILE__).'/admin_lib_rs.php' );
 
 if ( IS_MU_RS )
 	require_once( dirname(__FILE__).'/admin_lib-mu_rs.php' );
 
+global $pagenow;
+if ( 'nav-menus.php' == $pagenow ) {  // Administrators also need this, to add private posts to available items list
+	global $scoper_nav_menu_query;
+	require_once( dirname(__FILE__).'/filters-nav-menu-query_rs.php' );
+	$scoper_nav_menu_query = new ScoperNavMenuQuery();
+}
+	
 class ScoperAdmin
 {
 	var $scoper;
@@ -28,7 +35,7 @@ class ScoperAdmin
 	var $tinymce_readonly;
 	
 	function ScoperAdmin() {
-		global $pagenow;
+		global $pagenow, $plugin_page_cr;
 		
 		$this->scoper =& $GLOBALS['scoper'];
 		
@@ -67,16 +74,38 @@ class ScoperAdmin
 
 			add_action( 'admin_notices', array( &$this, 'dashboard_notice' ) );
 		}
+
+		if ( in_array( $pagenow, array( 'edit.php', 'post.php' ) ) && awp_ver( '3.5-beta' ) ) {
+			add_action( 'admin_menu', array( &$this, 'reinstate_solo_submenus' ) );
+			add_action( 'network_admin_menu', array( &$this, 'reinstate_solo_submenus' ) );
+		}
+		
+		if ( in_array( $plugin_page_cr, array( 'rs-options', 'rs-about' ) ) ) {
+			wp_enqueue_style( 'plugin-install' );
+			wp_enqueue_script( 'plugin-install' );
+			add_thickbox();
+		}
+	}
+	
+	function reinstate_solo_submenus() {
+		global $submenu;
+		
+		// Add a dummy submenu item to prevent WP from stripping out solitary submenus.  Otherwise menu access loses type sensitivity and requires "edit_posts" cap for all types.
+		foreach( $submenu as $key => $data ) {
+			if ( 1 == count( $submenu[$key] ) && ( 0 === strpos( $key, 'edit.php' ) ) ) {
+				$submenu[$key][999] =  array( '', 'read', $key );
+			}
+		}
 	}
 
 	function dashboard_notice() {
-		if ( ! is_content_administrator_rs() || defined('PP_VERSION') )
+		if ( ! is_super_admin() || defined('PP_VERSION') || defined('PPC_VERSION') )
 			return;
 
-		$msg_id = 'pp_offer';
+		$msg_id = 'ppcore_offer';
 		$dismissals = (array) scoper_get_option( 'dismissals' );
 
-		if ( in_array( $msg_id, $dismissals ) )
+		if ( isset( $dismissals[$msg_id] ) )
 			return;
 
 		require_once( dirname(__FILE__).'/misc/version_notice_rs.php' );
@@ -188,13 +217,7 @@ class ScoperAdmin
 
 		echo '<link rel="stylesheet" href="' . SCOPER_URLPATH . '/admin/role-scoper.css" type="text/css" />'."\n";
 
-		if ( 'rs-options' == $plugin_page_cr ) {
-			if ( scoper_get_option('version_update_notice') ) {
-				require_once( dirname(__FILE__).'/misc/version_notice_rs.php');
-				scoper_new_version_notice();
-			}
-
-		} elseif ( 'rs-about' == $plugin_page_cr ) {
+		if ( 'rs-about' == $plugin_page_cr ) {
 			echo '<link rel="stylesheet" href="' . SCOPER_URLPATH . '/admin/about/about.css" type="text/css" />'."\n";
 		}
 
@@ -212,15 +235,17 @@ class ScoperAdmin
 			$otype_def = $this->scoper->data_sources->member_property($src_name, 'object_types', $object_type);
 			
 			if ( ! empty($src) && ! empty($src->cols->parent) && empty($otype_def->ignore_object_hierarchy) ) {
-				$obj_title = sprintf( __('assign role for this %s', 'scoper'), agp_strtolower( $otype_def->labels->singular_name ) );
-				$child_title = sprintf( __('assign role for sub-%s', 'scoper'), agp_strtolower( $otype_def->labels->name ) );
+				if ( ! empty( $otype_def->labels ) ) {
+					$obj_title = sprintf( __('assign role for this %s', 'scoper'), agp_strtolower( $otype_def->labels->singular_name ) );
+					$child_title = sprintf( __('assign role for sub-%s', 'scoper'), agp_strtolower( $otype_def->labels->name ) );
 
-				$js_params = "var role_for_object_title = '$obj_title';"
-						. "var role_for_children_title = '$child_title';";
-		
-				// TODO: replace some of this JS with equivalent JQuery
-				echo "\n" . '<script type="text/javascript">' . $js_params . '</script>';
-				echo "\n" . "<script type='text/javascript' src='" . SCOPER_URLPATH . "/admin/rs-objrole-cbox-maint.js'></script>";
+					$js_params = "var role_for_object_title = '$obj_title';"
+							. "var role_for_children_title = '$child_title';";
+			
+					// TODO: replace some of this JS with equivalent JQuery
+					echo "\n" . '<script type="text/javascript">' . $js_params . '</script>';
+					echo "\n" . "<script type='text/javascript' src='" . SCOPER_URLPATH . "/admin/rs-objrole-cbox-maint.js'></script>";
+				}
 			}
 		}
 		
@@ -228,7 +253,8 @@ class ScoperAdmin
 		
 		if ( ( 0 === strpos( $plugin_page_cr, 'rs-' ) ) && strpos( $plugin_page_cr, 'roles' ) ) {
 			// add Ajax goodies we need for role duration/content date limit editing Bulk Role Admin
-			wp_print_scripts( array( 'page' ) );
+			if ( ! awp_ver('3.4') )
+				wp_print_scripts( array( 'page' ) );
 			
 			require_once( dirname(__FILE__).'/admin_lib-bulk_rs.php' );
 			ScoperAdminBulkLib::date_limits_js();

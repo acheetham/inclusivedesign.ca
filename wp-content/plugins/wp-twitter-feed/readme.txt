@@ -1,27 +1,23 @@
-=== Plugin Name ===
-Contributors: pleer
-Plugin Name:  Twitter Feed for WordPress
-Plugin URI:   http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/
-Donate link:  http://pleer.co.uk/go/twitter-paypal/
-Description:  A simple Twitter feed that outputs your latest tweets in HTML into any post, page, template or sidebar widget. Customisable and easy to install!
-Version:      1.2.1
-Author:       Alex Moss
-Author URI:   http://alex-moss.co.uk/
-Link: http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/
+=== Twitter Feed: Embedded Timeline WordPress Plugin ===
+Contributors: alexmoss, pleer
+Donate link:  http://peadig.com/go/twitter-paypal/
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: twitter, tweets, twitter feed, twitter updates, seo, plugin, widget, sidebar, page, post
 Requires at least: 2.7
-Tested up to: 3.3.1
-Stable tag: 1.2.1
+Tested up to: 3.7.1
+Stable tag: 2.1
 
-A simple Twitter feed that outputs your latest tweets in HTML into your page, template or sidebar widget. Customisable and easy to install!
+A simple Twitter feed that outputs your latest tweets in HTML into any post, page, template or sidebar widget. Customisable and easy to install!
 
 == Description ==
 
 The WordPress Twitter Feed Plugin lets you simply output any user's tweets into your WordPress page, template or sidebar! You can customise the username, number of tweets, and style of ouput.
 
 
-* [Twitter Feed](http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/) WordPress Plugin homepage.
-* More [WordPress Plugins](http://pleer.co.uk/wordpress/plugins/).
+* [Twitter Embedded Timeline](http://peadig.com/wordpress-plugins/wp-twitter-feed/) WordPress Plugin homepage.
+* [Twitter Feed PRO](http://peadig.com/wordpress-plugins/wp-twitter-feed-pro/) - this plugin outputs tweet using flat HTML and supports Twitter's API v1.1.
+* More [WordPress Plugins](http://peadig.com/wordpress-plugins/).
 
 == Installation ==
 
@@ -32,10 +28,28 @@ You can install the plugin using the following steps:
 3. Go to the Plugins page and activate the plugin
 4. Insert the shortcode!
 
-For full configuration and options please visit the [Twitter Feed WordPress Plugin](http://pleer.co.uk/wordpress/plugins/wp-twitter-feed/) plugin page.
+For full configuration and options please visit the [Twitter Feed WordPress Plugin](http://peadig.com/wordpress-plugins/wp-twitter-feed/) plugin page.
 
 
 == Changelog ==
+
+= 2.1 =
+
+* Branding update
+
+= 2.0 =
+
+* Inserted end of div missed
+
+= 2.0 =
+
+* Transformed to Twitter Embedded Timeline
+* Added settings page
+* Released Twitter Feed PRO
+
+= 1.2.2 =
+
+* Added decode option
 
 = 1.2.1 =
 

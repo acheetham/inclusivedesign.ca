@@ -195,6 +195,8 @@ class ScoperAdminFilters
 		}
 		
 		add_action( 'load-post.php', array( &$this, 'maybe_override_kses' ) );
+
+		add_action( 'add_link', 'wpp_cache_flush' );
 	}
 	
 	function maybe_override_kses() {
@@ -369,15 +371,25 @@ class ScoperAdminFilters
 	function act_nav_menu_ui() {
 		if ( ! $this->_can_edit_theme_locs() ) {
 			unset( $GLOBALS['wp_meta_boxes']['nav-menus']['side']['default']['nav-menu-theme-locations'] );
+			
+			if ( strpos( $_SERVER['REQUEST_URI'], 'nav-menus.php?action=locations' ) )
+				wp_die( __('You are not permitted to manage menu locations', 'scoper' ) );
 		}
 	}
 	
 	// make sure theme locations are not wiped because logged user has editing access to a subset of menus
 	function act_nav_menu_guard_theme_locs( $referer ) {
-		if ( 'update-nav_menu' == $referer ) {
-			if ( isset( $_POST['menu-locations'] ) ) {
-				if ( ! $this->_can_edit_theme_locs() )
-					unset( $_POST['menu-locations'] );
+		if ( 'update-nav_menu' == $referer ) {			
+			if ( ! $this->_can_edit_theme_locs() ) {
+				if ( awp_ver( '3.6-dev' ) ) {
+					if ( $stored_locs = get_theme_mod( 'nav_menu_locations' ) )
+						$_POST['menu-locations'] = (array) $stored_locs;
+					else
+						$_POST['menu-locations'] = array();
+				} else {
+					if ( isset( $_POST['menu-locations'] ) )
+						unset( $_POST['menu-locations'] );
+				}
 			}
 		}
 	}
@@ -718,12 +730,15 @@ class ScoperAdminFilters
 		if ( is_content_administrator_rs() )
 			return true;
 
+		if ( 'no_parent_filter' == scoper_get_option( 'lock_top_pages' ) )
+			return true;
+			
 		if ( ! $post_type_obj = get_post_type_object($post_type) )
 			return true;
 			
 		if ( ! $post_type_obj->hierarchical )
 			return true;
-			
+
 		// currently used only for page type, or for all if constant is set
 		$top_pages_locked = scoper_get_option( 'lock_top_pages' );
 			
@@ -731,12 +746,15 @@ class ScoperAdminFilters
 			if ( '1' === $top_pages_locked ) {
 				// only administrators can change top level structure
 				return false;
+			} elseif ( 'no_parent_filter' === $top_pages_locked ) {
+				return true;
 			} else {
 				$reqd_caps = ( 'author' === $top_pages_locked ) ? array( $post_type_obj->cap->publish_posts ) : array( $post_type_obj->cap->edit_others_posts );
 				$roles = $GLOBALS['scoper']->role_defs->qualify_roles($reqd_caps);
 				return array_intersect_key($roles, $GLOBALS['current_rs_user']->blog_roles[ANY_CONTENT_DATE_RS]);
 			}
-		}
+		} else
+			return true;
 	}		
 } // end class
 

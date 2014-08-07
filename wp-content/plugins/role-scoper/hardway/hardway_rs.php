@@ -29,7 +29,7 @@ if ( $scoper->data_sources->is_member('link') )
 // flt_get_terms '' so private posts are included in count, as basis for display when hide_empty arg is used
 
 add_filter('get_pages', array('ScoperHardway', 'flt_get_pages'), 1, 2);
-	
+
 /**
  * ScoperHardway PHP class for the WordPress plugin Role Scoper
  * hardway_rs.php
@@ -127,6 +127,9 @@ class ScoperHardway
 		// for the page parent dropdown, return no available selections for a published main page if the logged user isn't allowed to de-associate it from Main
 		if ( ! empty( $name ) && ( 'parent_id' == $name ) ) {
 			global $post;
+			
+			if ( 'no_parent_filter' == scoper_get_option( 'lock_top_pages' ) )
+				return $results;
 			
 			if ( ! $post->post_parent && ! $GLOBALS['scoper_admin_filters']->user_can_associate_main( $post_type ) ) {
 				$status_obj = get_post_status_object( $post->post_status );
@@ -270,6 +273,8 @@ class ScoperHardway
 		else
 			$frontend_list_private = false;
 
+		$force_publish_status = ! $frontend_list_private && ( 'publish' == $post_status );
+			
 		// WP core does not include private pages in query.  Include private statuses in anticipation of user-specific filtering		
 		if ( $post_status && ( ( 'publish' != $post_status ) || ( $is_front && ! $frontend_list_private ) ) )
 			$where_status = $wpdb->prepare( "post_status = '%s'", $post_status );	
@@ -312,8 +317,8 @@ class ScoperHardway
 			}
 
 		} else {
-			$_args = array( 'skip_teaser' => true );
-
+			$_args = array( 'skip_teaser' => true, 'retain_status' => $force_publish_status );
+			
 			if ( in_array( $GLOBALS['pagenow'], array( 'post.php', 'post-new.php' ) ) ) {
 				if ( $post_type_obj = get_post_type_object( $post_type ) ) {
 					$plural_name = plural_name_from_cap_rs( $post_type_obj );
@@ -340,7 +345,7 @@ class ScoperHardway
 		// ====================================
 
 		// Role Scoper note: WP core get_pages has already updated wp_cache and pagecache with unfiltered results.
-		update_page_cache($pages);
+		update_post_cache($pages);
 		
 
 		// === BEGIN Role Scoper MODIFICATION: Support a disjointed pages tree with some parents hidden ========

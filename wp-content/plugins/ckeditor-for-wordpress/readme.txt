@@ -2,8 +2,8 @@
 Contributors: wiktor, michal_cksource, dczepierga, Dean Lee
 Tags: post, wysiwyg, CKEditor, FCKeditor, editor, rich text, rte, rich text editor
 Requires at least: 3.2
-Tested up to: 3.3
-Stable tag: 3.6.2.5
+Tested up to: 3.5
+Stable tag: 4.0.0.1
 This plugin replaces the default WordPress editor with <a href="http://ckeditor.com/">CKEditor</a>.
 
 == Description ==
@@ -16,8 +16,8 @@ It brings to the web common editing features found on desktop editing applicatio
 
 <strong>CKEditor</strong> is compatible with most internet browsers and operating systems, including:
 <ul>
-<li>Internet Explorer 6+</li>
-<li>Firefox 3.0+</li>
+<li>Internet Explorer 8+</li>
+<li>Firefox</li>
 <li>Safari</li>
 <li>Google Chrome</li>
 <li>Opera</li>
@@ -25,14 +25,23 @@ It brings to the web common editing features found on desktop editing applicatio
 
 Live demo is available at <a href="http://wordpress.ckeditor.com/">http://wordpress.ckeditor.com/</a>.
 
-Features:
+= Maintenance status =
+
+<strong>Looking for maintainers.</strong> If you would like to take over the development of this extension or just help in developing a component used by thousands of users, then please contact me: w.walc /at/ cksource.com.
+The extension is currently not maintained, use it at your own risk.
+
+= Upgrading =
+
+When upgrading from CKEditor For WordPress 3.6.3 to **CKEditor For WordPress 4.0**, make sure to **clear browser cache** (*Ctrl+Shift+Delete*).
+
+= Features =
 
 * Replace the default WordPress editor with CKEditor
 * Post comment with CKEditor to provide styled and colorful comments (Optional)
-* Build-in file manager and upload manager, also supports <a href="http://ckfinder.com">CKFinder</a> – an AJAX file browser
-* Build-in WordPress "read more" Button
+* Built-in file manager and upload manager, also supports <a href="http://ckfinder.com">CKFinder</a> – an AJAX file browser
+* Built-in WordPress "read more" Button
 * Integration plugin for <a href="http://wordpress.org/extend/plugins/vipers-video-quicktags/">Viper's Video Quicktags</a>
-* Intergation plugin for <a href="http://wordpress.org/extend/plugins/wp-polls/">Wp-Polls</a>
+* Integration plugin for <a href="http://wordpress.org/extend/plugins/wp-polls/">Wp-Polls</a>
 * Integration plugin for <a href="http://wordpress.org/extend/plugins/gd-star-rating/">GD Star Rating</a>
 * Integration plugin for <a href="http://wordpress.org/extend/plugins/nextgen-gallery/">NextGEN Gallery</a>
 * Integrated with WordPress media buttons
@@ -53,11 +62,49 @@ Features:
 
 1. Add/Edit post
 2. Leave comment through CKEditor
-3. Built-in file manager
 
 == Changelog ==
 
+= V4.0.0.1 - 15.07.2014 =
+
+* Backported security patch from CKEditor 4.4.3.
+
+= V4.0 dev - 20.12.2012 =
+
+* Enabled bidi buttons
+
+= V4.0 - 19.12.2012 =
+
+* Updated CKEditor to 4.0 version
+* Set the default skin to Moono
+* Modified the default toolbars
+* Increased the default height of editor for comments
+* Fixed image captions
+* Added protection against caching JavaScript files by the browser, by appending CKEditor timestamp to js files
+* Fixed: CKEditor does not load when "external" plugin is enabled, but the required extension is not installed
+* Minor fixes in the old built-in file browser
+* Spellchecker plugins are now enabled in "Advanced Options"
+ 
+= V3.6.3 - 21.06.2012 =
+
+ * Update CKEditor to 3.6.3 version
+ * Fix bug: CKEditor breaks ajax comment reply function on dasboard (http://wordpress.org/support/topic/ckeditor-breaks-wordpress-built-in-ajax-reply-function?replies=2)
+ * Fix bug: IE - remove border of image when is as a link
+ * New feature: Add option to use CKEditor in excerpt field (http://wordpress.org/support/topic/plugin-ckeditor-for-wordpress-having-ckeditor-for-excerpt).
+ * Fix bug: remove calling for non-existent css file
+ * Fix bug with File Gallery plugin compatibilty: http://wordpress.org/support/topic/plugin-ckeditor-for-wordpress-ckeditor-isnt-show-by-default-when-page-loads
+ * Change default settings for CKEditor Output Formatting. This should fix problems with inserting youtube videos to post.
+ * Fix bug: CKFinder can not use it's config variable when this variable is object
+ * Refactor code: changes leading spaces for tabs to according Wordpress code syntax sandard
+ * Fix bug: Duplicate class attribute for image caption (http://wordpress.org/support/topic/image-attachment-class-problem)
+ * Fix PHP E_STRICT warnings (http://wordpress.org/support/topic/php-strict-errors)
+ * Fix PHP Notice: Invalid argument supplied for foreach() in overview.php file.
+ * Fix bug: On page with comment form JavaScript errors occurs when W3 Total cache plugin is used. Turn off minfiy on page with comment form.
+ * Fix bug: Checking if SSL being used (http://wordpress.org/support/topic/plugin-ckeditor-for-wordpress-blank-white-edit-screen)
+ * Fix look of plugin's overview page
+
 = V3.6.2.5 - 23.02.2012 =
+
  * Fix bug: Fix JavaScript error: instance is undefined
  * Fix bug: Call to undefined method _WP_Editors::editor_settings() (http://wordpress.org/support/topic/plugin-ckeditor-for-wordpress-error-on-activation)
  * Fix bug: Fix notice error of auto detecting language when viewing website (http://wordpress.org/support/topic/throwing-notice-error-when-viewing-website)

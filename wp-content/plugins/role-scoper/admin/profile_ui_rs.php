@@ -308,10 +308,12 @@ class ScoperProfileUI {
 	
 		if ( $group = ScoperAdminLib::get_group($group_id) ) {
 			if ( ! strpos( $group->meta_id, '_nr_' ) ) {
+				global $wpdb;
+				
 				echo '<div class="rs-group-profile">';
 				
 				if ( IS_MU_RS && scoper_get_option( 'mu_sitewide_groups' ) ) {
-					global $wpdb, $blog_id;
+					global $blog_id;
 					$blog_ids = scoper_get_col( "SELECT blog_id FROM $wpdb->blogs ORDER BY blog_id" );
 					$orig_blog_id = $blog_id;	
 				} else
@@ -321,6 +323,9 @@ class ScoperProfileUI {
 					if ( count($blog_ids) > 1 )
 						switch_to_blog( $id );
 
+					if ( ! $wpdb->get_results( "SHOW TABLES LIKE '$wpdb->user2role2object_rs'" ) )
+						continue;
+					
 					ScoperProfileUI::display_ui_user_roles($user, true);  //arg: groups only
 				}
 				

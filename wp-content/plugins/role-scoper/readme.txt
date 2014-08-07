@@ -1,18 +1,19 @@
 === Plugin Name ===
 Contributors: kevinB
-Donate link: http://agapetry.net/news/introducing-role-scoper/#role-scoper-download
-Tags: restrict, access, permissions, cms, user, members, admin, category, categories, pages, posts, page, Post, privacy, private, attachment, files, rss, feed
+Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=JWZVFUDLLYQBA
+Tags: restrict, access, permissions, cms, user, private, category, pages, privacy, attachment
+License: GPLv2
 Requires at least: 3.0
-Tested up to: 3.3.1
-Stable Tag: 1.3.55
+Tested up to: 3.6.1
+Stable Tag: 1.3.63
 
 CMS-like permissions for reading and editing. Content-specific restrictions and roles supplement/override WordPress roles. User groups optional.
 
 == Description ==
 
-Role Scoper is a comprehensive access control solution, giving you CMS-like control of reading and editing permissions.  Assign restrictions and roles to specific pages, posts or categories.  For WP 2.7 to 2.9, use [Role Scoper 1.2.x](http://agapetry.net/downloads/role-scoper_legacy).
+Role Scoper is a comprehensive access control solution, giving you CMS-like control of reading and editing permissions.  Assign restrictions and roles to specific pages, posts or categories.
 
-<strong>Role Scoper has a big brother!</strong> Are you interested in a friendlier UI, cleaner restriction model with WP Roles integration, custom Visibility and Moderation statuses, bbPress content roles, BuddyPress role groups and professional support? Step up to <a href='http://presspermit.com'>Press Permit</a>.
+<strong style="color:#c00">Role Scoper is no longer actively developed.</strong>For feature requests (including plugin compatability issues) and WP 3.7+ compatibility try the successor plugins, <a href='http://wordpress.org/extend/plugins/press-permit-core/'>Press Permit Core</a> and <a href='http://presspermit.com'>Press Permit Pro</a>.  See the <a href='http://presspermit.com/pp-rs-feature-grid'>RS-PP feature comparison grid</a> for details.
 
 = How it works: =
 Your WordPress core role definitions remain unchanged, and continue to function as default permissions.  User access is altered only as you expand it by assigning content-specific roles, or reduce it by setting content-specific restrictions.
@@ -43,10 +44,6 @@ Scoped role restrictions and assignments are reflected in every aspect of the Wo
 * Supports custom Post Types and Taxonomies (when defined using WP schema by a plugin such as [Custom Post Type UI](http://wordpress.org/extend/plugins/custom-post-type-ui/) 
 * Extensive WP-mu support
 
-= Plugin API =
-* Abstract architecture and API allow other plugins to define their own data/taxonomy schema and role definitions
-* Author provides some [extensions to support integration with other plugins](http://agapetry.net/category/plugins/role-scoper/role-scoper-extensions/)
-
 = Template Functions =
 Theme code can utilize the is&#95;restricted&#95;rs() and is&#95;teaser&#95;rs() functions to customize front-end styling.
 
@@ -55,7 +52,7 @@ Other useful functions include users&#95;who&#95;can(), which accounts for all c
 For more information, see the [Usage Guide](http://agapetry.net/downloads/RoleScoper_UsageGuide.htm) or [Support Forum](http://agapetry.net/forum/).
 
 = Support =
-* Most Bug Reports and Plugin Compatibility issues addressed promptly following your [support forum](http://agapetry.net/forum/) submission.
+* Author periodically reviews [support forum](http://agapetry.net/forum/) and addresses any major bugs on supported WP versions.
 * Author is available for professional consulting to meet your configuration, troubleshooting and customization needs.
 
 == Installation ==
@@ -95,9 +92,9 @@ Role Scoper creates and uses the following tables: groups&#95;rs, user2group&#95
 
 Due to the potential damage incurred by accidental deletion, no automatic removal is currently available.  You can use a SQL editing tool such as phpMyAdmin to drop the tables and delete the scoper options.
 
-= With the launch of Press Permit as a professional equivalent, is Role Scoper still supported? =
+= With the production release of Press Permit, is Role Scoper still supported? =
 
-Yes, at this point I plan to keep Role Scoper compatible with upcoming WP versions and address future bug reports. However, Press Permit will receive support priority and most new functionality will be built around that plugin. This has proven to be a necessary move to fund development at this scale. 
+Basic Role Scoper support (bug fixes but not necessarily plugin conflict resolution) will be provided while WP 3.6.x is the active WordPress version. Compatibility with WP 3.7 and beyond is not assured, as I do not plan any further unfunded development of the Role Scoper code base. Further development and support will be available on a consulting basis as indicated on agapetry.net, but I will encourage migration to Press Permit - a superior platform with a sustainable funding model. 
 
 == Screenshots ==
 
@@ -111,6 +108,124 @@ Yes, at this point I plan to keep Role Scoper compatible with upcoming WP versio
 8. [View more screenshots](http://agapetry.net/news/introducing-role-scoper/)
 
 == Changelog ==
+
+= 1.3.63 - 15 Oct 2013 =
+* Compat : Eyes Only User Access Shortcode (requires v 1.6)
+
+= 1.3.62 - 20 Sep 2013 =
+* Fixed : File Filtering did not work on new Multisite installations or those with ms-files.php usage disabled (since WP 3.5.1)
+* Fixed : With File Filtering enabled, direct url access to some filenames with hyphens was improperly blocked
+* Fixed : Multisite - Users with no role on a site could not read public posts
+* Fixed : Multisite - Network-wide groups setting available in individual site admin when not activated network-wide
+* Fixed : Default Private option forced drafts into private publishing
+* Fixed : Comment notification emails were blocked in some situations
+* Fixed : Fatal error on Edit User / Edit Group screen in some situations
+* Fixed : Hidden Content Teaser caused posts to be shown as uncategorized
+* Fixed : Disabling "Include Private Pages in listing" option did not suppress them from get_pages() results for Administrators
+* Fixed : On network installations, Network Groups setting was improperly applied if RS was not activated network-wide
+* Fixed : PHP Warning for missing index 'plugin_page'
+* Fixed : PHP Warnings on bulk role edit screens in some situations
+* Fixed? : RS Role Defintions could not be modified on some installations
+* Change : Allow private posts could not be added to nav menus
+* Compat : WP 3.6 - Nav Menu Manager role assignments
+* Compat : Revisionary - fatal error for undefined class RevisionaryAdminHardway under some configurations
+* Compat : Relevanssi - user pages and category pages were blocked from search results
+* API : Support required_operation argument in query_posts(). Pass post_type and required_operation=read for front end admin-ajax queries.
+* Perf : Slow post queries due to content date limits clause, even if Role Content Date Limits were disabled
+* Change : Notice about RS development and support winding down; availability of RS Migration Advisor and Press Permit Core plugins
+* Feature : Support installation of RS Migration Advisor plugin
+* Change : About screen content
+* Change : Eliminated remote call to agapetry.net for consulting status
+* Change : Eliminated agapetry.net version update check
+* Change : RS Options screen - popup plugin info box for Revisionary
+
+= 1.3.61 - 26 Apr 2013 =
+* Fixed : If a custom post type is hierarchical, non-Administrators could not create new post if "Lock Top Pages" enabled for any roles
+* Fixed : RS roles were ineffective in some situations
+* Fixed : Assignment of term to a Media item did not cause it to be included in get_terms query results
+* Fixed : Multisite - Database error under some configurations when deleting or removing a user
+* Fixed : Multisite - Database error under some configurations when viewing user profile
+* Fixed? : PHP warning "mysql_real_escape_string() expects parameter 1 to be string" on post creation / update, under some configurations
+* Fixed : PHP warnings on activation
+* Lang : Dropped Italian translation due to reported inaccuracy
+
+= 1.3.60 - 23 Jan 2013 =
+* Fixed : Non-Administrators could not edit posts unless create_posts capability is defined for post type and included in their role (since 1.3.58)
+
+= 1.3.59 - 14 Dec 2012 =
+* Fixed : Could not add/edit media library items on WP 3.5 (since 1.3.58)
+
+= 1.3.58 - 12 Dec 2012 =
+* Compat : WP 3.5 - Custom posts could not be created or edited when post type enabled for RS filtering
+* Compat : WP 3.5 - edit_posts capability was required to access Edit menu for any post type
+* Compat : WP 3.5 - Support usage of the new create_posts capability (new checkbox in Roles > Options > Features > Content Maintenance)
+* Fixed : Posts were unreadable if associated with a taxonomy which has no terms, under some configurations
+* Fixed : RS Roles assigned to [Anonymous] group were ineffective
+* Fixed : XML-RPC post editing by users who are not sitewide Editors failed or caused categories to be dropped
+* Fixed : Multisite: when activated on a single site but not network activated, some RS options could not be edited
+
+= 1.3.57 - 10 Oct 2012 =
+* Fixed : Fatal error on first-time installation (Call to undefined function cr_role_caps)
+* Fixed : XML-RPC publishing error with Windows Live Writer, under some configurations
+* Fixed : XML-RPC connection failure with some external apps (including Lightbox NGG Exporter)
+* Fixed : RS Roles and Restrictions were not effective for post types or taxonomies with long names (>13 characters for Private Reader role, 20 to 24 for others)
+* Fixed : Default Roles were not assigned when post was created by a non-Editor
+* Fixed : Incorrect comment counts for non-Editors
+* Fixed : PHP 5.4 - warning "Creating default object from empty value" on front end access (sporadically or when internal cache not enabled)
+* Fixed : PHP warning for improper is_404() call
+* Fixed : Various PHP warnings
+* Change : If constant SCOPER_NO_HTACCESS is defined, eliminate all .htaccess file manipulations and rewrite rules insertions
+* Change : When deactivating or turning off file filtering, don't alter the .htaccess file if it does not contain a Role Scoper block
+* Compat : Relevanssi - teaser text always displayed for all search results (when Hidden Content Teaser enabled)
+* Compat : NextGen Gallery - Flash Uploader failure for non-Administrators
+* Compat : Revisionary - "Edit Pages" search results were displayed as uneditable under some configurations
+* Compat : Revisionary and other plugins which call users_who_can() - invalid empty array response under some configurations
+
+= 1.3.56 - 3 Aug 2012 =
+
+= WP 3.4 / PHP 5.4 =
+* Fixed : PHP 5.4 - warnings "Creating default object from empty value" (various symptoms including failed installations)
+* Fixed : WP 3.4 - stop using deprecated functions
+
+= Front End =
+* Feature : Filter post terms listing (function get_the_terms)
+* Fixed : Posts of inappropriate type were included in front-end posts listing under some configurations
+* Fixed : Calendar widget was not filtered
+
+= Category Roles / Media Upload =
+* Fixed : Files could not be uploaded when editing roles are category-specific
+* Fixed : When post authoring capabilities are from category role, files could not be uploaded to a new post prior to saving it
+* Fixed : Quick Press did not work when posting capabilities are via Category Role
+
+= Other Fixes =
+* Fixed : Other user's unattached uploads were always available in Media Library, regardless of RS option setting
+* Fixed : XML-RPC (ScribeFire) posting failure in some configurations, due to PHP warning
+* Fixed : SCOPER_NO_ATTACHMENT_COMMENTS constant definition was ineffective for Administrators
+* Fixed : If "Users CSV Entry" option enabled, Group Members could not be added via rs_group_members > edit
+* Fixed : Categories / terms were filtered even if removed from Realm > Taxonomy Usage
+* Fixed : Multisite - Database errors (usually non-displayed and harmless PHP warnings) on first access of any site following creation or RS install
+* Fixed : Database errors (usually non-displayed and harmless PHP warnings) on first-time RS installation
+
+= Links / Link Categories =
+* Fixed : Link Editor restrictions did not limit category selection
+* Fixed : Link Editor role did not permit viewing widget on front end
+* Fixed : Non-Editors could not see newly added link in link-manager.php until RS cache is flushed
+
+= Page Editing =
+* Feature : New option Roles > Options > Advanced > Page Structure > "no Page Parent filter", means anyone who can edit submit or publish a page can select any parent
+
+= Obscure Changes =
+* Feature : SCOPER_PUBLIC_ATTACHMENT_COMMENTS constant definition forces get_comments() inclusion of all comments on attachments to public posts (but not private posts)
+* Feature : SCOPER_AUTHORS_ASSIGN_ANY_ROLE constant definition allows authors to assign Editor role for their own posts
+* Fixed : Improper filtering of manually constructed post queries that have multiple WHERE clause criteria with one of the criteria "post_status ="
+
+= Plugin Compatibility =
+* Compat : Relevanssi - filtering failed due to modified plugin filter API in Relevanssi Free 2.9.15 and Premium 1.8
+* Compat : Relevanssi - PHP Warning for non-array under some conditions
+* Compat : WPML - improper comment filtering in wp-admin when WPML activated
+* Compat : CMS Page Tree View - could not create subpages based on propagating object roles
+* Advanced Custom Fields : ACF custom fields were not displed on term edit screen, RS roles and restrictions display wasted space
+* Subscribe2 : Subscription category selection checklist was not filtered
 
 = 1.3.55 - 22 Feb 2012 =
 * Feature : If jQuery is loaded on front end, hide titles of menus which have no readable items
@@ -799,6 +914,8 @@ Improves Nav Menu Manager and Category Manager role assignment; filters "Add New
 * Role Scoper's menus, onscreen captions and inline descriptive footnotes [can be translated using poEdit](http://weblogtoolscollection.com/archives/2007/08/27/localizing-a-wordpress-plugin-using-poedit/).  I will gladly include any user-contributed languages!.
 
 == Plugin Compatibility Issues ==
+
+**Custom WP_Query calls** : Often, conflicts can be resolved by specifying a post_type argument. To prevent improper filtering of front-end ajax calls, pass required_operation=read
 
 **WP Super Cache** : set WPSC option to disable caching for logged users (unless you only use Role Scoper to customize editing access).
 

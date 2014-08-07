@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ckeditor_admin_overview()
  *
@@ -120,17 +119,21 @@ function ckeditor_overview_server() {
 				<tr>
 					<td><?php _e('PHP Memory Limit', 'ckeditor_wordpress'); ?></td><td><?php echo $memory_limit; ?></td>
 				</tr>
-				<?php foreach ($php_info['gd'] as $key => $val) {
-						if (!preg_match('/(WBMP|XBM|Freetype|T1Lib)/i', $key)) {
-							echo '<tr>';
-							echo '<td>'.$key.'</td>';
-							if (stripos($key, 'support') === false) {
-								echo '<td>'.$val.'</td>';
+				<?php
+					if (isset($php_info['gd']) && is_array($php_info['gd']))
+					{
+						foreach ($php_info['gd'] as $key => $val) {
+							if (!preg_match('/(WBMP|XBM|Freetype|T1Lib)/i', $key) && $key != 'Directive' && $key != 'gd.jpeg_ignore_warning') {
+								echo '<tr>';
+								echo '<td>'.$key.'</td>';
+								if (stripos($key, 'support') === false) {
+									echo '<td>'.$val.'</td>';
+								}
+								else {
+									echo '<td>'.ckeditor_colorify_value($val, 'enabled').'</td>';
+								}
+								echo '</tr>';
 							}
-							else {
-								echo '<td>'.ckeditor_colorify_value($val, 'enabled').'</td>';
-							}
-							echo '</tr>';
 						}
 					}
 				?>
@@ -160,8 +163,8 @@ function ckeditor_overview_compatibility() {
 	<div>
 	<table class="form-table compat_logos">
 		<tr valign="top">
-			<td class="logos ie"> </td><td>Internet Explorer 6.0+</td>
-			<td class="logos firefox"> </td><td>Firefox 2.0+</td>
+			<td class="logos ie"> </td><td>Internet Explorer 7.0+</td>
+			<td class="logos firefox"> </td><td>Firefox 3.0+</td>
 		</tr>
 		<tr valign="top">
 			<td class="logos safari"> </td><td>Safari 3.0+</td>
@@ -186,13 +189,13 @@ function ckeditor_overview_configuration() {
 	<div>
 	<table class="form-table">
 		<tr valign="top">
-			<th>Plugin Version</th><td><?php echo $GLOBALS['ckeditor_plugin_version']; ?></td>
+			<td>Plugin Version</td><td><?php echo $GLOBALS['ckeditor_plugin_version']; ?></td>
 		</tr>
 		<tr valign="top">
-			<th>Editor Version</th><td><?php echo $GLOBALS['ckeditor_version']; ?></td>
+			<td>Editor Version</td><td><?php echo $GLOBALS['ckeditor_version']; ?></td>
 		</tr>
 		<tr valign="top">
-			<th>CKFinder</th><td><?php echo $GLOBALS['ckfinder_status']; ?></td>
+			<td>CKFinder</td><td><?php echo $GLOBALS['ckfinder_status']; ?></td>
 		</tr>
 	</table>
 	</div>

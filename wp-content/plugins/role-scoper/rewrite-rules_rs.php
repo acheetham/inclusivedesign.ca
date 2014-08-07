@@ -19,8 +19,15 @@ class ScoperRewrite {
 				return;
 		}
 
-		if ( $insertion || file_exists($file_path) )	
+		if ( $insertion || file_exists($file_path) ) {
+			if ( ! $insertion ) { // if no insertion and no existing entry, don't mess
+				$htcontent = file_get_contents($file_path);
+				if ( false === strpos( $htcontent, $marker_text ) )
+					return;
+			}
+		
 			insert_with_markers( $file_path, $marker_text, explode( "\n", $insertion ) );
+		}
 	}
 	
 	
@@ -48,7 +55,7 @@ class ScoperRewrite {
 		
 		// sleep() time is necessary to avoid .htaccess file i/o race conditions since other plugins (W3 Total Cache) may also perform or trigger .htaccess update, and those file operations don't all use flock
 		// This update only occurs on plugin activation, the first time a MS site has an attachment to a private/restricted page, and on various plugin option changes.
-		if ( IS_MU_RS ) {
+		if ( IS_MU_RS && ( ! awp_ver('3.5') || get_site_option( 'ms_files_rewriting' ) ) ) {
 			add_action( 'shutdown', create_function( '', "sleep(2); require_once( dirname(__FILE__).'/rewrite-mu_rs.php' ); ScoperRewriteMU::update_mu_htaccess( '$include_rs_rules' );" ) );
 		} else {
 			if ( file_exists( ABSPATH . '/wp-admin/includes/misc.php' ) )
@@ -66,7 +73,7 @@ class ScoperRewrite {
 			return;
 	
 		$http_auth = scoper_get_option( 'feed_link_http_auth' );
-		$filtering = IS_MU_RS && get_site_option( 'scoper_file_filtering' );	// scoper_get_option is not reliable for initial execution following plugin activation
+		$filtering = IS_MU_RS && ( ! awp_ver('3.5') || get_site_option( 'ms_files_rewriting' ) ) && get_site_option( 'scoper_file_filtering' );	// scoper_get_option is not reliable for initial execution following plugin activation
 		
 		$new_rules = '';
 		
@@ -108,7 +115,7 @@ class ScoperRewrite {
 			return false;
 		
 		// don't risk leaving custom .htaccess files in content folder at deactivation due to difficulty of reconstructing custom path for each blog
-		if ( IS_MU_RS ) {
+		if ( IS_MU_RS && ( ! awp_ver('3.5') || get_site_option( 'ms_files_rewriting' ) ) ) {
 			global $blog_id;
 			
 			if ( 'site-new.php' == $GLOBALS['pagenow'] )
@@ -126,6 +133,9 @@ class ScoperRewrite {
 	
 	function update_blog_file_rules( $include_rs_rules = true ) {
 		global $blog_id;
+		
+		if ( defined( 'SCOPER_NO_HTACCESS' ) )
+			return;
 		
 		// avoid file collision by skipping if another flush was initiated < 5 seconds ago
 		if ( $last_regen = scoper_get_option( 'file_htaccess_date' ) ) {
@@ -150,13 +160,16 @@ class ScoperRewrite {
 		$uploads = scoper_get_upload_info();
 		
 		// If a filter has changed MU basedir, don't filter file attachments for this blog because we might not be able to regenerate the basedir for rule removal at RS deactivation
-		if ( ! IS_MU_RS || strpos( $uploads['basedir'], "/blogs.dir/$blog_id/files" ) || ( false !== strpos( $uploads['basedir'], trailingslashit(WP_CONTENT_DIR) . 'uploads' ) ) ) {
+		if ( ! IS_MU_RS || ( awp_ver('3.5') && ! get_site_option( 'ms_files_rewriting' ) ) || strpos( $uploads['basedir'], "/blogs.dir/$blog_id/files" ) || ( false !== strpos( $uploads['basedir'], trailingslashit(WP_CONTENT_DIR) . 'uploads' ) ) ) {
 			$htaccess_path = trailingslashit($uploads['basedir']) . '.htaccess';
 			ScoperRewrite::insert_with_markers( $htaccess_path, 'Role Scoper', $rules );
 		}
 	}
 	
 	function &build_blog_file_rules() {
+		if ( defined( 'SCOPER_NO_HTACCESS' ) )
+			return '';
+		
 		$new_rules = '';
 
 		require_once( dirname(__FILE__).'/analyst_rs.php' );
@@ -250,7 +263,7 @@ class ScoperRewrite {
 			}
 		} // end foreach protected attachment
 
-		if ( IS_MU_RS ) {
+		if ( IS_MU_RS && ( ! awp_ver('3.5') || get_site_option( 'ms_files_rewriting' ) ) ) {
 			global $blog_id;
 			$file_filtered_sites = (array) get_site_option( 'scoper_file_filtered_sites' );
 			if ( ! in_array( $blog_id, $file_filtered_sites ) ) {
@@ -273,6 +286,9 @@ class ScoperRewrite {
 	
 	// called by agp_return_file() in abnormal cases where file access is approved, but key for protected file is lost/corrupted in postmeta record or .htaccess file
 	function resync_file_rules() {
+		if ( defined( 'SCOPER_NO_HTACCESS' ) )
+			return;
+	
 		// Don't allow this to execute too frequently, to prevent abuse or accidental recursion
 		if ( agp_time_gmt() - get_option( 'last_htaccess_resync_rs' ) > 30 ) {
 			update_option( 'last_htaccess_resync_rs', agp_time_gmt() );

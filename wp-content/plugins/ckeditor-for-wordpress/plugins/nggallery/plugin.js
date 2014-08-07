@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 CKEDITOR.plugins.add( 'nextgen',
@@ -47,7 +47,8 @@ CKEDITOR.plugins.add( 'nextgen',
 			{
 				label : 'Nextgen Gallery',
 				icon : this.path + 'nextgen.gif',
-				command : 'nextgen'
+				command : 'nextgen',
+				toolbar: 'wordpress,100'
 			});
 
 		// Register the commands.
